@@ -1,4 +1,4 @@
-##This is an example program for SDL2. 
+## This is an example program for SDL2. 
 
 All SDL function call has been packed in `SDLPlayer` class. What you need to do is inherit from class `VideoFactory`, implement its most important function `GetAvailableFrame`, which will be call in `SDLPlayer` to get new frame.
 
