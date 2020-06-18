@@ -29,6 +29,12 @@ void MulticastVideoFactory::OpenStream(const std::string& multicast_address) {
       std::bind(&MulticastVideoFactory::OnFrameReady,
         this,
         std::placeholders::_1));
+  stream_hub::SetLogCallback(
+  [](const char *file, int line, const char *func, int severity, const char *content){
+    if(severity > 0)
+      LOG_DEBUG << content;
+  });
+
   video_stream_->SetFrameRateCallback(
       std::bind(&MulticastVideoFactory::OnFrameRateChanged,
         this,
@@ -42,6 +48,7 @@ void MulticastVideoFactory::CloseStream() {
   if (video_stream_) {
     video_stream_->CloseStream();
     video_stream_ = nullptr;
+    LOG_DEBUG << "After close stream";
   }
 }
 
@@ -49,7 +56,7 @@ std::unique_ptr<VideoFrame> MulticastVideoFactory::GetAvailableFrame() {
   std::unique_lock<std::mutex> lock_(mutex_);
   while (frame_queue_.empty()) {
     if(cond_.wait_for(lock_, std::chrono::milliseconds(200)) == std::cv_status::timeout){
-      break;
+      return nullptr;
     }
   }
   std::unique_ptr<VideoFrame> frame = std::move(frame_queue_.front());
@@ -66,5 +73,7 @@ void MulticastVideoFactory::OnFrameReady(std::unique_ptr<VideoFrame> frame) {
   frame_queue_.push(std::move(frame));
 }
 
-void MulticastVideoFactory::OnFrameRateChanged(int total, int dropped, int decoded) {}
+void MulticastVideoFactory::OnFrameRateChanged(int total, int dropped, int decoded) {
+  LOG_DEBUG << decoded;
+}
 }

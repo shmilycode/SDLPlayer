@@ -6,11 +6,13 @@
 
 #define EXPORT __attribute__((visibility("default")))
 using MLogCallBack = std::function<void(const char *file, int line, const char *func, int severity, const char *content)>;
+class VideoReceiver;
 namespace stream_hub {
 
 class VideoClient;
 class VideoFrame;
 class VideoInputDevice;
+class VideoReceiveImageObserver;
 
 EXPORT void SetLogCallback(MLogCallBack logcallback);
 
@@ -39,6 +41,8 @@ public:
 private:
   std::mutex stream_lock_;
   std::unique_ptr<VideoInputDevice> video_input_device_;
+  std::unique_ptr<VideoReceiveImageObserver> decoder_image_provider_;;
+  std::unique_ptr<VideoReceiver> video_receiver_;
   std::unique_ptr<VideoClient> video_client_;
 };
 

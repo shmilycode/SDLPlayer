@@ -39,7 +39,7 @@ int main(int argc, char** argv) {
   char input;
   while((input=getch()) == 'q')
     break;
-  video_factory->CloseStream();
   sdl_player->Stop();
+  video_factory->CloseStream();
   return 0;
 }
